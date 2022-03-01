@@ -36,7 +36,7 @@ where
         Self { value, next: None }
     }
 
-    fn append(&mut self, value: T) {
+    pub fn append(&mut self, value: T) {
         unsafe {
             let mut head_ptr: *mut Node<T> = self;
             while (*head_ptr).next.is_some() {
