@@ -52,7 +52,10 @@ impl<T> Node<T> where T: std::fmt::Display + std::fmt::Debug {
             let mut count: usize = 0;
             while !(*head_ptr).next.is_none() {
                 if count == index {
-                    println!("Adding between after {}", (*head_ptr).value);
+                    let mut newnode = Box::new(Node::new(value));
+                    newnode.next = (*head_ptr).next;
+                    let newnode = Box::into_raw(newnode);
+                    (*head_ptr).next = Some(newnode);
                     return
                 }
                 head_ptr = (*head_ptr).next.unwrap();
@@ -60,7 +63,9 @@ impl<T> Node<T> where T: std::fmt::Display + std::fmt::Debug {
             }
             // Check if adding to last index
             if index == count {
-                println!("Adding between after {}", (*head_ptr).value);
+                let newnode = Box::new(Node::new(value));
+                let newnode = Box::into_raw(newnode);
+                (*head_ptr).next = Some(newnode);
                 return
             }
             println!("The Linked List is of length {}. Cannot add at index {}", count, index);
@@ -93,6 +98,6 @@ fn main() {
     head.add(1, "89");
     head.add(2, "89");
     head.add(3, "89");
-    head.add(4, "89");
-    // head.print();
+    head.add(100, "89");
+    head.print();
 }
