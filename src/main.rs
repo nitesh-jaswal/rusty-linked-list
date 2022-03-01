@@ -25,7 +25,7 @@ impl<T> Drop for Node<T> {
     }
 }
 
-impl<T> Node<T> where T: std::fmt::Display + std::fmt::Debug {
+impl<T> Node<T> where T: std::fmt::Display + std::fmt::Debug + std::marker::Copy {
     fn new(value: T) -> Self {
         Self {
             value,
@@ -46,10 +46,22 @@ impl<T> Node<T> where T: std::fmt::Display + std::fmt::Debug {
         }
     }
 
-    fn add(&mut self, index: usize, value: T) {
+    fn add_at_index(&mut self, index: usize, value: T) {
         unsafe {
+            // Adding at first position
+            if index == 0 {
+                // let mut new_head = Node::new(value);
+                let old_head = Box::new(Node::new(self.value));
+                let old_head = Box::into_raw(old_head);
+                (*old_head).next = self.next; 
+                self.value = value;
+                self.next = Some(old_head);
+                return
+            }
+
+            // Add after index
             let mut head_ptr: *mut Node<T> = self;
-            let mut count: usize = 0;
+            let mut count: usize = 1;
             while !(*head_ptr).next.is_none() {
                 if count == index {
                     let mut newnode = Box::new(Node::new(value));
@@ -61,14 +73,15 @@ impl<T> Node<T> where T: std::fmt::Display + std::fmt::Debug {
                 head_ptr = (*head_ptr).next.unwrap();
                 count += 1;
             }
-            // Check if adding to last index
+
+            // Check if adding after last index
             if index == count {
                 let newnode = Box::new(Node::new(value));
                 let newnode = Box::into_raw(newnode);
                 (*head_ptr).next = Some(newnode);
                 return
             }
-            println!("The Linked List is of length {}. Cannot add at index {}", count, index);
+            panic!("The Linked List is of length {}. Cannot add at index {}", count, index);
         }
     }
 
@@ -90,14 +103,12 @@ impl<T> Node<T> where T: std::fmt::Display + std::fmt::Debug {
 }
 
 fn main() {
-    let mut head = Node::new("this");
-    head.append("is");
-    head.append("a");
-    head.append("test");
-    head.add(0, "89");
-    head.add(1, "89");
-    head.add(2, "89");
-    head.add(3, "89");
-    head.add(100, "89");
+    let mut head = Node::new("Start");
+    head.add_at_index(0, "89");
+    head.add_at_index(1, "90");
+    head.add_at_index(3, "91");
+    head.add_at_index(0, "88");
+    head.add_at_index(5, "92");
+    // head.add_at_index(100, "I will Panic");
     head.print();
 }
