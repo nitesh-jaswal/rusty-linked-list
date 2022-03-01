@@ -45,6 +45,28 @@ impl<T> Node<T> where T: std::fmt::Display + std::fmt::Debug {
             (*head_ptr).next = Some(newnode);
         }
     }
+
+    fn add(&mut self, index: usize, value: T) {
+        unsafe {
+            let mut head_ptr: *mut Node<T> = self;
+            let mut count: usize = 0;
+            while !(*head_ptr).next.is_none() {
+                if count == index {
+                    println!("Adding between after {}", (*head_ptr).value);
+                    return
+                }
+                head_ptr = (*head_ptr).next.unwrap();
+                count += 1;
+            }
+            // Check if adding to last index
+            if index == count {
+                println!("Adding between after {}", (*head_ptr).value);
+                return
+            }
+            println!("The Linked List is of length {}. Cannot add at index {}", count, index);
+        }
+    }
+
     // You can also use unsafe in fn signature. This would just mean that the 
     // user has to explicitly open an unsafe block whenever xey are using this function.
     // Useful to make them aware that the code is "unsafe" in Rust terms.
@@ -67,5 +89,10 @@ fn main() {
     head.append("is");
     head.append("a");
     head.append("test");
-    head.print();
+    head.add(0, "89");
+    head.add(1, "89");
+    head.add(2, "89");
+    head.add(3, "89");
+    head.add(4, "89");
+    // head.print();
 }
