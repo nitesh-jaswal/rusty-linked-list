@@ -3,6 +3,7 @@ use std::fmt::{Debug, Display};
 use std::marker::Copy;
 use std::ptr::NonNull;
 
+// TODO: Create wrapper struct to manage Linked List instead of  directly interacting with Node
 pub struct Node<T> {
     value: T,
     next: Option<NonNull<Node<T>>>,
@@ -51,6 +52,9 @@ where
         }
     }
 
+    // Because we are directly interacting with nodes, there can never be an 
+    // empty LinkedList. The minimum no. of members will be 1 i.e. head
+    // which would need to be dropped to clear it
     pub fn remove_at_index(&mut self, index: usize) -> Option<T> {
         unsafe {
             let count = self.count();
@@ -162,6 +166,22 @@ mod tests {
         let mut list = Node::new(69);
         list.append(420);
         list.add_at_index(2, 1111);
-        assert!(list.count() == 3);
+        list.add_at_index(2, 1234);
+        list.append(666);
+        list.remove_at_index(2);
+        assert!(list.count() == 4);
+    }
+
+    #[test]
+    fn check_removed_element() {
+        let mut list = Node::new(1);
+        list.append(2);
+        list.append(3);
+        list.append(4);
+        list.append(5);
+        assert!(list.remove_at_index(0) == Some(1));
+        assert!(list.remove_at_index(3) == Some(5));
+        assert!(list.remove_at_index(1) == Some(3));
+        assert!(list.remove_at_index(10) == None);
     }
 }
