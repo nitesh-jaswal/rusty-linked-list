@@ -137,12 +137,17 @@ where
     pub fn print(&self) {
         unsafe {
             let mut head_ptr: *const Node<T> = self;
-
-            while !(*head_ptr).next.is_none() {
-                println!("{}", (*head_ptr).value);
+            let mut str_repr = String::new();
+            loop {
+                str_repr += format!("{}", (*head_ptr).value).as_str();
+                if (*head_ptr).next.is_none() {
+                    break
+                }
                 head_ptr = (*head_ptr).next.unwrap().as_ptr();
+                str_repr += " -> ";
+
             }
-            println!("{}", (*head_ptr).value);
+            println!("{}", str_repr);
         }
     }
 

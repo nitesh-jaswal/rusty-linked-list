@@ -14,7 +14,7 @@ fn main() {
     println!("Removed {:?}", head.remove_at_index(0));
     println!("Removed {:?}", head.remove_at_index(2));
     println!("Removed {:?}", head.remove_at_index(3));
-    println!("Removed {:?}", head.pop());
-    println!("LinkedList after removing elements...");
+    head.print();
+    println!("Popped last element {:?} ...", head.pop());
     head.print();
 }
