@@ -10,4 +10,10 @@ fn main() {
     // head.add_at_index(100, "I will Panic");
     // Expected Output: 88-89-90-Start-91-92
     head.print();
+    println!("This is LinkedList before removing elements...");
+    println!("Removed {:?}", head.remove_at_index(0));
+    println!("Removed {:?}", head.remove_at_index(2));
+    println!("Removed {:?}", head.remove_at_index(3));
+    println!("LinkedList after removing elements...");
+    head.print();
 }

@@ -51,6 +51,43 @@ where
         }
     }
 
+    pub fn remove_at_index(&mut self, index: usize) -> Option<T> {
+        unsafe {
+            let count = self.count();
+            if count == 0 || index + 1 > count {
+                return None
+            }
+            // Last index is a special case
+            let mut head_ptr: *mut Node<T> = self;
+            let mut prev_node_ptr: *mut Node<T> = head_ptr;
+            for _ in 0..index {
+                prev_node_ptr = head_ptr;
+                head_ptr = (*head_ptr).next.unwrap().as_ptr();
+            }
+
+            if index + 1 == count {
+                // Retval will be the value in the node that has been currently iterated to i.e. head_ptr
+                // Simply point the prev_node to None
+                // Drop head_ptr
+                let retval = Some((*head_ptr).value);
+                (*prev_node_ptr).next = None;
+                drop(head_ptr);
+                retval
+            }
+            else {
+                // Store the node after the current node as nextnode
+                // Copy contents of nextnode into self
+                // Drop nextnode
+                let retval = Some((*head_ptr).value);
+                let nextnode = (*head_ptr).next.unwrap().as_ptr();
+                (*head_ptr).next = (*nextnode).next;
+                (*head_ptr).value = (*nextnode).value;
+                drop(nextnode);
+                retval
+            }
+        }
+    }
+
     pub fn add_at_index(&mut self, index: usize, value: T) {
         unsafe {
             // Adding at first position
@@ -114,8 +151,6 @@ where
         }
         count
     }
-
-
 }
 
 #[cfg(test)]
