@@ -52,6 +52,41 @@ where
         }
     }
 
+    pub fn add_at_index(&mut self, index: usize, value: T) {
+        unsafe {
+            // Adding at first position
+            if index == 0 {
+                let old_head = Box::into_raw(Box::new(Node::new(self.value)));
+                (*old_head).next = self.next; 
+                self.value = value;
+                self.next = Some(NonNull::new(old_head)).unwrap();
+                return
+            }
+
+            // Add after index
+            let mut head_ptr: *mut Node<T> = self;
+            let mut count: usize = 1;
+            while (*head_ptr).next.is_some() {
+                if count == index {
+                    let mut newnode = Box::new(Node::new(value));
+                    newnode.next = (*head_ptr).next;
+                    let newnode = Box::into_raw(newnode);
+                    (*head_ptr).next = Some(NonNull::new(newnode)).unwrap();
+                    return
+                }
+                head_ptr = (*head_ptr).next.unwrap().as_ptr();
+                count += 1;
+            }
+
+            // Check if adding after last index
+            if index == count {
+                let newnode = Box::into_raw(Box::new(Node::new(value)));
+                (*head_ptr).next = Some(NonNull::new(newnode)).unwrap();
+                return
+            }
+            panic!("The Linked List is of length {}. Cannot add at index {}", count, index);
+        }
+    }
     // Because we are directly interacting with nodes, there can never be an 
     // empty LinkedList. The minimum no. of members will be 1 i.e. head
     // which would need to be dropped to clear it
@@ -91,41 +126,9 @@ where
             }
         }
     }
-
-    pub fn add_at_index(&mut self, index: usize, value: T) {
-        unsafe {
-            // Adding at first position
-            if index == 0 {
-                let old_head = Box::into_raw(Box::new(Node::new(self.value)));
-                (*old_head).next = self.next; 
-                self.value = value;
-                self.next = Some(NonNull::new(old_head)).unwrap();
-                return
-            }
-
-            // Add after index
-            let mut head_ptr: *mut Node<T> = self;
-            let mut count: usize = 1;
-            while (*head_ptr).next.is_some() {
-                if count == index {
-                    let mut newnode = Box::new(Node::new(value));
-                    newnode.next = (*head_ptr).next;
-                    let newnode = Box::into_raw(newnode);
-                    (*head_ptr).next = Some(NonNull::new(newnode)).unwrap();
-                    return
-                }
-                head_ptr = (*head_ptr).next.unwrap().as_ptr();
-                count += 1;
-            }
-
-            // Check if adding after last index
-            if index == count {
-                let newnode = Box::into_raw(Box::new(Node::new(value)));
-                (*head_ptr).next = Some(NonNull::new(newnode)).unwrap();
-                return
-            }
-            panic!("The Linked List is of length {}. Cannot add at index {}", count, index);
-        }
+    
+    pub fn pop(&mut self) -> Option<T> {
+        self.remove_at_index(self.count() - 1)
     }
 
     // You can also use unsafe in fn signature. This would just mean that the 
@@ -180,7 +183,7 @@ mod tests {
         list.append(4);
         list.append(5);
         assert!(list.remove_at_index(0) == Some(1));
-        assert!(list.remove_at_index(3) == Some(5));
+        assert!(list.pop() == Some(5));
         assert!(list.remove_at_index(1) == Some(3));
         assert!(list.remove_at_index(10) == None);
     }
