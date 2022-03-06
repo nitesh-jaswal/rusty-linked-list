@@ -103,14 +103,14 @@ where
                 prev_node_ptr = head_ptr;
                 head_ptr = (*head_ptr).next.unwrap().as_ptr();
             }
-
+            // If last node is to be dropped
             if index + 1 == count {
                 // Retval will be the value in the node that has been currently iterated to i.e. head_ptr
                 // Simply point the prev_node to None
                 // Drop head_ptr
                 let retval = Some((*head_ptr).value);
                 (*prev_node_ptr).next = None;
-                drop(head_ptr);
+                dealloc(head_ptr as *mut u8, Layout::new::<Node<T>>());
                 retval
             }
             else {
@@ -121,7 +121,7 @@ where
                 let nextnode = (*head_ptr).next.unwrap().as_ptr();
                 (*head_ptr).next = (*nextnode).next;
                 (*head_ptr).value = (*nextnode).value;
-                drop(nextnode);
+                dealloc(nextnode as *mut u8, Layout::new::<Node<T>>());
                 retval
             }
         }
