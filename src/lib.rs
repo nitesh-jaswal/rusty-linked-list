@@ -109,7 +109,7 @@ where
                 // Drop head_ptr
                 let retval = Some((*head_ptr).value);
                 (*prev_node_ptr).next = None;
-                Box::from:raw(head_ptr);
+                Box::from_raw(head_ptr);
                 retval
             }
             else {
@@ -120,7 +120,7 @@ where
                 let nextnode = (*head_ptr).next.unwrap().as_ptr();
                 (*head_ptr).next = (*nextnode).next;
                 (*head_ptr).value = (*nextnode).value;
-                Box::from:raw(nextnode);
+                Box::from_raw(nextnode);
                 retval
             }
         }
