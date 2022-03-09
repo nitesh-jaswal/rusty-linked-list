@@ -1,4 +1,3 @@
-use std::alloc::{dealloc, Layout};
 use std::fmt::{Debug, Display};
 use std::marker::Copy;
 use std::ptr::NonNull;
@@ -22,9 +21,9 @@ impl<T> Drop for Node<T> {
                 while (*ptr).next.is_some() {
                     let temp = ptr;
                     ptr = (*ptr).next.unwrap().as_ptr();
-                    dealloc(temp as *mut u8, Layout::new::<Node<T>>());
+                    Box::from_raw(ptr);
                 }
-                dealloc(ptr as *mut u8, Layout::new::<Node<T>>());
+                Box::from_raw(ptr);
             }
         }
     }
@@ -110,7 +109,7 @@ where
                 // Drop head_ptr
                 let retval = Some((*head_ptr).value);
                 (*prev_node_ptr).next = None;
-                dealloc(head_ptr as *mut u8, Layout::new::<Node<T>>());
+                Box::from_raw(head_ptr);
                 retval
             }
             else {
@@ -121,7 +120,7 @@ where
                 let nextnode = (*head_ptr).next.unwrap().as_ptr();
                 (*head_ptr).next = (*nextnode).next;
                 (*head_ptr).value = (*nextnode).value;
-                dealloc(nextnode as *mut u8, Layout::new::<Node<T>>());
+                Box::from_raw(nextnode);
                 retval
             }
         }
